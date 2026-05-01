@@ -1,0 +1,20 @@
+send_command:
+  name: Stuur commando
+  description: Stuur een of meerdere DP commando's direct naar een Tuya device.
+  target:
+    entity:
+      domain: vun_tuya
+  fields:
+    commands:
+      name: Commando's
+      description: >
+        Lijst van DP commando's. Elk commando heeft een "code" (DP code, bijv. "switch_led")
+        en een "value" (de gewenste waarde, bijv. true of 500).
+      required: true
+      example:
+        - code: switch_led
+          value: true
+        - code: bright_value_v2
+          value: 500
+      selector:
+        object:

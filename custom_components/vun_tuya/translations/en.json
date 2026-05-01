@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up VUN Tuya",
+        "description": "Enter your Tuya IoT Platform credentials. You can find these at {cloud_url}.",
+        "data": {
+          "api_key": "API Key (Client ID)",
+          "api_secret": "API Secret (Client Secret)",
+          "region": "Region",
+          "username": "SmartLife username (optional)",
+          "password": "SmartLife password (optional)",
+          "country_code": "Country code (e.g. 31 for Netherlands)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to Tuya Cloud. Check your API credentials and region.",
+      "api_key_required": "API Key is required.",
+      "api_secret_required": "API Secret is required."
+    },
+    "abort": {
+      "already_configured": "This Tuya account is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VUN Tuya options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "subnet": "Subnet for local scan (e.g. 192.168.1.0/24)",
+          "scan_timeout": "Local scan timeout (seconds)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "domain": "vun_tuya",
+  "name": "VUN Tuya",
+  "version": "1.0.0",
+  "documentation": "https://github.com/vincentvunen/vun-tuya-hacs",
+  "issue_tracker": "https://github.com/vincentvunen/vun-tuya-hacs/issues",
+  "requirements": ["tinytuya==1.14.0"],
+  "dependencies": [],
+  "codeowners": ["@vincentvunen"],
+  "iot_class": "local_polling",
+  "config_flow": true,
+  "integration_type": "hub"
+}
