@@ -13,15 +13,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CATEGORY_PLATFORM_MAP, DATA_COORDINATOR, DOMAIN
+from .const import DATA_COORDINATOR, DOMAIN
 from .coordinator import VunTuyaCoordinator
 from .entity import VunTuyaEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-ALARM_CATEGORIES = {"alarm", "wg", "mal"}
-
-# Tuya master_state waarden → HA AlarmControlPanelState
 ALARM_STATE_MAP: dict[str, AlarmControlPanelState] = {
     "disarmed":  AlarmControlPanelState.DISARMED,
     "arm":       AlarmControlPanelState.ARMED_AWAY,
@@ -33,29 +30,19 @@ ALARM_STATE_MAP: dict[str, AlarmControlPanelState] = {
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: VunTuyaCoordinator = hass.data[DOMAIN][entry.entry_id][DATA_COORDINATOR]
-
-    entities = []
-    if coordinator.data:
-        for device_id, device in coordinator.data.items():
-            category = device.get("category", "")
-            if (
-                CATEGORY_PLATFORM_MAP.get(category) == "alarm_control_panel"
-                or category in ALARM_CATEGORIES
-            ):
-                entities.append(VunTuyaAlarm(coordinator, device_id))
-
-    async_add_entities(entities)
+    async_add_entities(
+        VunTuyaAlarm(coordinator, e)
+        for e in coordinator.entities_config
+        if e["entity_type"] == "alarm_control_panel"
+    )
 
 
 class VunTuyaAlarm(VunTuyaEntity, AlarmControlPanelEntity):
     """Vertegenwoordigt een Tuya alarmpaneel."""
 
-    _attr_name = None
     _attr_supported_features = (
         AlarmControlPanelEntityFeature.ARM_HOME
         | AlarmControlPanelEntityFeature.ARM_AWAY
@@ -65,7 +52,7 @@ class VunTuyaAlarm(VunTuyaEntity, AlarmControlPanelEntity):
 
     @property
     def alarm_state(self) -> AlarmControlPanelState | None:
-        val = self._get_dp_value("master_state", "alarm_switch")
+        val = self._get("alarm_state") or self._get("state")
         if val is None:
             return None
         if isinstance(val, bool):
@@ -73,25 +60,13 @@ class VunTuyaAlarm(VunTuyaEntity, AlarmControlPanelEntity):
         return ALARM_STATE_MAP.get(str(val), AlarmControlPanelState.DISARMED)
 
     async def async_alarm_disarm(self, code: str | None = None) -> None:
-        await self._send_state("disarmed")
+        await self._send_dp("alarm_state", "disarmed")
 
     async def async_alarm_arm_home(self, code: str | None = None) -> None:
-        await self._send_state("home")
+        await self._send_dp("alarm_state", "home")
 
     async def async_alarm_arm_away(self, code: str | None = None) -> None:
-        await self._send_state("arm")
+        await self._send_dp("alarm_state", "arm")
 
     async def async_alarm_trigger(self, code: str | None = None) -> None:
-        await self._send_state("sos")
-
-    async def _send_state(self, value: str) -> None:
-        dp = "master_state" if self._has_dp("master_state") else "alarm_switch"
-        if dp == "alarm_switch":
-            payload = value not in ("disarmed", False)
-        else:
-            payload = value
-        await self._async_send([{"code": dp, "value": payload}])
-
-    def _has_dp(self, code: str) -> bool:
-        status: list[dict] = self._device_data.get("status") or []
-        return any(item["code"] == code for item in status)
+        await self._send_dp("alarm_state", "sos")

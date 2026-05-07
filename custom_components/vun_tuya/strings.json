@@ -3,24 +3,20 @@
     "step": {
       "user": {
         "title": "VUN Tuya instellen",
-        "description": "Voer je Tuya IoT Platform credentials in. Je kunt deze vinden op {cloud_url}.",
+        "description": "Voer het adres in van je VUN-Tuya-Hassio server. Standaard poort is 7654.",
         "data": {
-          "api_key": "API Key (Client ID)",
-          "api_secret": "API Secret (Client Secret)",
-          "region": "Regio",
-          "username": "SmartLife gebruikersnaam (optioneel)",
-          "password": "SmartLife wachtwoord (optioneel)",
-          "country_code": "Landcode (bijv. 31 voor Nederland)"
+          "host": "Server adres (bijv. http://192.168.1.100:7654)",
+          "api_key": "API-sleutel (optioneel, alleen als auth ingeschakeld is)"
         }
       }
     },
     "error": {
-      "cannot_connect": "Kan geen verbinding maken met Tuya Cloud. Controleer je API credentials en regio.",
-      "api_key_required": "API Key is verplicht.",
-      "api_secret_required": "API Secret is verplicht."
+      "cannot_connect": "Kan geen verbinding maken met de VUN-Tuya-Hassio server. Controleer het adres en of de server bereikbaar is.",
+      "invalid_auth": "Authenticatie mislukt — controleer je API-sleutel.",
+      "endpoint_not_found": "Discovery endpoint niet gevonden. Zorg dat je een recente versie van VUN-Tuya-Hassio gebruikt (v3.1.2+)."
     },
     "abort": {
-      "already_configured": "Deze Tuya account is al geconfigureerd."
+      "already_configured": "Deze VUN-Tuya-Hassio server is al geconfigureerd."
     }
   },
   "options": {
@@ -28,21 +24,7 @@
       "init": {
         "title": "VUN Tuya opties",
         "data": {
-          "scan_interval": "Polling interval (seconden)",
-          "subnet": "Subnet voor lokale scan (bijv. 192.168.1.0/24)",
-          "scan_timeout": "Timeout voor lokale scan (seconden)"
-        }
-      }
-    }
-  },
-  "services": {
-    "send_command": {
-      "name": "Stuur commando",
-      "description": "Stuur DP commando's direct naar een Tuya device.",
-      "fields": {
-        "commands": {
-          "name": "Commando's",
-          "description": "Lijst van {code, value} objecten."
+          "scan_interval": "Polling interval (seconden)"
         }
       }
     }

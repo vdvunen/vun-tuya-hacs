@@ -1,4 +1,4 @@
-"""Cover platform voor VUN Tuya integratie (rolluiken, gordijnen, garagedeuren)."""
+"""Cover platform voor VUN Tuya integratie (rolluiken, gordijnen)."""
 from __future__ import annotations
 
 import logging
@@ -14,42 +14,27 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import CATEGORY_PLATFORM_MAP, DATA_COORDINATOR, DOMAIN
+from .const import DATA_COORDINATOR, DOMAIN
 from .coordinator import VunTuyaCoordinator
 from .entity import VunTuyaEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-COVER_CATEGORIES = {"cl", "clkg", "cz_cl", "wkcz"}
-
-COVER_DPS = {
-    "control": ["control", "mach_operate", "work_state"],
-    "position": ["percent_control", "position"],
-    "current_position": ["percent_state", "position_state"],
-}
-
 
 async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: VunTuyaCoordinator = hass.data[DOMAIN][entry.entry_id][DATA_COORDINATOR]
-
-    entities = []
-    if coordinator.data:
-        for device_id, device in coordinator.data.items():
-            category = device.get("category", "")
-            if CATEGORY_PLATFORM_MAP.get(category) == "cover" or category in COVER_CATEGORIES:
-                entities.append(VunTuyaCover(coordinator, device_id))
-
-    async_add_entities(entities)
+    async_add_entities(
+        VunTuyaCover(coordinator, e)
+        for e in coordinator.entities_config
+        if e["entity_type"] == "cover"
+    )
 
 
 class VunTuyaCover(VunTuyaEntity, CoverEntity):
     """Vertegenwoordigt een Tuya rolluik of gordijn."""
 
-    _attr_name = None
     _attr_device_class = CoverDeviceClass.BLIND
     _attr_supported_features = (
         CoverEntityFeature.OPEN
@@ -60,48 +45,26 @@ class VunTuyaCover(VunTuyaEntity, CoverEntity):
 
     @property
     def current_cover_position(self) -> int | None:
-        val = self._get_dp_value(*COVER_DPS["current_position"])
-        if val is None:
-            val = self._get_dp_value(*COVER_DPS["position"])
-        if val is None:
-            return None
-        return int(val)
+        val = self._get("current_position") or self._get("position")
+        return int(val) if val is not None else None
 
     @property
     def is_closed(self) -> bool | None:
         pos = self.current_cover_position
-        if pos is None:
-            return None
-        return pos == 0
-
-    @property
-    def is_opening(self) -> bool:
-        state = self._get_dp_value(*COVER_DPS["control"])
-        return state == "open"
-
-    @property
-    def is_closing(self) -> bool:
-        state = self._get_dp_value(*COVER_DPS["control"])
-        return state == "close"
+        return pos == 0 if pos is not None else None
 
     async def async_open_cover(self, **kwargs: Any) -> None:
-        await self._async_send([{"code": "control", "value": "open"}])
+        if code := self._dp_code("state"):
+            await self._send([{"code": code, "value": "open"}])
 
     async def async_close_cover(self, **kwargs: Any) -> None:
-        await self._async_send([{"code": "control", "value": "close"}])
+        if code := self._dp_code("state"):
+            await self._send([{"code": code, "value": "close"}])
 
     async def async_stop_cover(self, **kwargs: Any) -> None:
-        await self._async_send([{"code": "control", "value": "stop"}])
+        if code := self._dp_code("state"):
+            await self._send([{"code": code, "value": "stop"}])
 
     async def async_set_cover_position(self, **kwargs: Any) -> None:
         position = kwargs.get(ATTR_POSITION, 0)
-        control_code = self._first_present_code(COVER_DPS["position"])
-        await self._async_send([{"code": control_code, "value": position}])
-
-    def _first_present_code(self, candidates: list[str]) -> str:
-        status: list[dict] = self._device_data.get("status") or []
-        codes = {item["code"] for item in status}
-        for code in candidates:
-            if code in codes:
-                return code
-        return candidates[0]
+        await self._send_dp("position", position)

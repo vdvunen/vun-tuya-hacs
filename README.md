@@ -3,28 +3,26 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![HA versie](https://img.shields.io/badge/Home%20Assistant-2024.1%2B-blue.svg)](https://www.home-assistant.io/)
 
-Lokale Tuya-integratie voor Home Assistant met Tuya Cloud sync voor local keys. Bestuurt apparaten **rechtstreeks via het lokale netwerk** (LAN), zonder Cloud-afhankelijkheid bij gebruik.
+Home Assistant integratie die verbindt met een **VUN-Tuya-Hassio** server (v3.1.2+). Alle Tuya-synchronisatie en apparaatbeheer verloopt via die server — in HA verschijnen de apparaten als native entities.
 
 ---
 
 ## Functies
 
-- **Lokale LAN-besturing** — commando's gaan direct naar het apparaat, niet via de Tuya Cloud
-- **Automatische Cloud sync** — haalt local keys en apparaatlijst op via de Tuya IoT API
-- **Cloud fallback** — als lokale besturing mislukt, valt het terug op de Tuya Cloud API
+- **Verbindt met VUN-Tuya-Hassio** — geen aparte Tuya API-sleutels nodig in HA
+- **Lokale LAN-besturing** — commando's gaan via de VUN-server direct naar het apparaat
 - **Meerdere platformtypes**: licht, schakelaar, klimaat, sensor, binaire sensor, ventilator, rolluik, slot, stofzuiger, alarm, deurbel
-- **Energie-meting** — vermogen, stroom, spanning, energie voor slimme stekkers
-- **Config flow** — eenvoudig in te stellen via de HA UI, geen YAML nodig
-- **Options flow** — polling interval en subnet aanpasbaar na installatie
+- **Automatische entity-detectie** — alle bevestigde entities in VUN-Tuya-Hassio verschijnen automatisch
+- **Mapping-gebaseerd** — gebruikt de DP-mappings uit VUN-Tuya-Hassio voor correcte attribuut-koppeling
+- **Config flow** — eenvoudig in te stellen via de HA UI, alleen server-adres nodig
 
 ---
 
 ## Vereisten
 
 - Home Assistant 2024.1 of nieuwer
-- Een [Tuya IoT Platform](https://iot.tuya.com/) account met een Cloud project
-- API Key (Client ID) en API Secret van het Cloud project
-- Regio instellen die overeenkomt met je Tuya account (EU/US/CN/IN)
+- Een draaiende **VUN-Tuya-Hassio** server v3.1.2 of nieuwer (bereikbaar via het netwerk vanuit HA)
+- Minimaal één bevestigde entity in VUN-Tuya-Hassio
 
 ---
 
@@ -50,32 +48,24 @@ Lokale Tuya-integratie voor Home Assistant met Tuya Cloud sync voor local keys. 
 
 ## Configuratie
 
-### Stap 1 — Tuya IoT Platform
+### Stap 1 — VUN-Tuya-Hassio
 
-1. Ga naar [iot.tuya.com](https://iot.tuya.com/) en log in
-2. Maak een **Cloud project** aan (type: Smart Home)
-3. Kopieer je **Client ID** (API Key) en **Client Secret** (API Secret)
-4. Koppel je SmartLife/Tuya app-account aan het project via **Link App Account**
-5. Stel de juiste regio in (EU = Europa, US = Amerika, etc.)
+Zorg dat de VUN-Tuya-Hassio server draait en dat er bevestigde entities zijn (status = confirmed). Standaard draait de server op poort **7654**.
+
+Als auth ingeschakeld is in VUN-Tuya-Hassio, maak dan een API-sleutel aan via **Instellingen → Gebruikers** in de VUN-webinterface.
 
 ### Stap 2 — HA integratie
 
 | Veld | Beschrijving |
 |------|-------------|
-| API Key | Client ID van je Tuya Cloud project |
-| API Secret | Client Secret van je Tuya Cloud project |
-| Regio | Regio van je Tuya account |
-| SmartLife gebruikersnaam | Optioneel, voor extra authenticatie |
-| SmartLife wachtwoord | Optioneel |
-| Landcode | Landcode zonder +, bijv. `31` voor Nederland |
+| Server adres | Volledig adres van VUN-Tuya-Hassio, bijv. `http://192.168.1.100:7654` |
+| API-sleutel | Optioneel — alleen nodig als auth ingeschakeld is |
 
 ### Opties (aanpasbaar na installatie)
 
 | Optie | Standaard | Beschrijving |
 |-------|-----------|-------------|
-| Polling interval | 30 sec | Hoe vaak de status wordt ververst |
-| Subnet | 192.168.1.0/24 | Netwerk voor lokale apparaten |
-| Scan timeout | 6 sec | Timeout per apparaat bij lokale scan |
+| Polling interval | 30 sec | Hoe vaak de device status wordt ververst |
 
 ---
 
