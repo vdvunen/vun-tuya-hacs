@@ -37,7 +37,10 @@ TUYA_REGION_URLS = {
 }
 
 # Platforms die deze integratie aanmaakt
-PLATFORMS = ["light", "switch", "climate", "sensor", "binary_sensor", "fan"]
+PLATFORMS = [
+    "light", "switch", "climate", "sensor", "binary_sensor", "fan",
+    "cover", "lock", "vacuum", "alarm_control_panel",
+]
 
 # Categorie → primair platform
 CATEGORY_PLATFORM_MAP: dict[str, str] = {
@@ -78,6 +81,29 @@ CATEGORY_PLATFORM_MAP: dict[str, str] = {
     "mcs": "binary_sensor",
     "ywbj": "binary_sensor",
     "jwbj": "binary_sensor",
+    # Videodeurbel → binary_sensor (bel/beweging)
+    "sp": "binary_sensor",
+    "dbl": "binary_sensor",
+    "sp2": "binary_sensor",
+    "ds": "binary_sensor",
+    # Rolluiken / gordijnen
+    "cl": "cover",
+    "clkg": "cover",
+    "wkcz": "cover",
+    # Sloten
+    "ms": "lock",
+    "jtmspro": "lock",
+    "videolock": "lock",
+    # Robotstofzuigers
+    "sd": "vacuum",
+    "sweeper": "vacuum",
+    "mop": "vacuum",
+    "sz": "vacuum",
+    "sdmop": "vacuum",
+    # Alarmpanelen
+    "alarm": "alarm_control_panel",
+    "wg": "alarm_control_panel",
+    "mal": "alarm_control_panel",
 }
 
 # DP codes voor lichten
@@ -240,6 +266,17 @@ BINARY_SENSOR_DPS: dict[str, dict] = {
     "alarm_temperature": {
         "name": "Temperatuuralarm",
         "device_class": "heat",
+        "on_value": True,
+    },
+    # Videodeurbel
+    "doorbell_active": {
+        "name": "Deurbel",
+        "device_class": "sound",
+        "on_value": True,
+    },
+    "motion_switch": {
+        "name": "Beweging",
+        "device_class": "motion",
         "on_value": True,
     },
 }

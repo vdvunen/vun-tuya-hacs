@@ -12,7 +12,7 @@ Lokale Tuya-integratie voor Home Assistant met Tuya Cloud sync voor local keys. 
 - **Lokale LAN-besturing** — commando's gaan direct naar het apparaat, niet via de Tuya Cloud
 - **Automatische Cloud sync** — haalt local keys en apparaatlijst op via de Tuya IoT API
 - **Cloud fallback** — als lokale besturing mislukt, valt het terug op de Tuya Cloud API
-- **Meerdere platformtypes**: licht, schakelaar, klimaat, sensor, binaire sensor, ventilator
+- **Meerdere platformtypes**: licht, schakelaar, klimaat, sensor, binaire sensor, ventilator, rolluik, slot, stofzuiger, alarm, deurbel
 - **Energie-meting** — vermogen, stroom, spanning, energie voor slimme stekkers
 - **Config flow** — eenvoudig in te stellen via de HA UI, geen YAML nodig
 - **Options flow** — polling interval en subnet aanpasbaar na installatie
@@ -31,7 +31,7 @@ Lokale Tuya-integratie voor Home Assistant met Tuya Cloud sync voor local keys. 
 ## Installatie via HACS
 
 1. Open HACS → Integraties → rechtsboven de drie stippen → **Aangepaste repository's**
-2. Voeg `https://github.com/vincentvunen/vun-tuya-hacs` toe als type **Integratie**
+2. Voeg `https://github.com/vdvunen/vun-tuya-hacs` toe als type **Integratie**
 3. Zoek naar **VUN Tuya** en installeer
 4. Herstart Home Assistant
 5. Ga naar **Instellingen → Apparaten & Services → Integratie toevoegen**
@@ -91,6 +91,11 @@ Lokale Tuya-integratie voor Home Assistant met Tuya Cloud sync voor local keys. 
 | Bewegingssensor | pir | binary_sensor |
 | Deursensor | mcs | binary_sensor |
 | Rooksensor | ywbj | binary_sensor |
+| Videodeurbel | sp, dbl, sp2, ds | binary_sensor |
+| Rolluik / gordijn | cl, clkg, wkcz | cover |
+| Slim slot | ms, jtmspro, videolock | lock |
+| Robotstofzuiger | sd, sweeper, mop, sz, sdmop | vacuum |
+| Alarmpaneel | alarm, wg, mal | alarm_control_panel |
 
 ---
 
@@ -104,7 +109,7 @@ Lokale Tuya-integratie voor Home Assistant met Tuya Cloud sync voor local keys. 
 
 ## Problemen melden
 
-Dien een issue in op [GitHub Issues](https://github.com/vincentvunen/vun-tuya-hacs/issues).
+Dien een issue in op [GitHub Issues](https://github.com/vdvunen/vun-tuya-hacs/issues).
 
 ---
 
